@@ -7,11 +7,12 @@ import {
   Clock, 
   User,
   Filter,
-  ArrowRight
+  ArrowRight,
+  Download
 } from 'lucide-react';
 import { brandService } from '../services/brandService';
 import { Brand, Stage } from '../types';
-import { cn, formatDate } from '../lib/utils';
+import { cn, formatDate, exportToCSV } from '../lib/utils';
 import { motion } from 'motion/react';
 
 const STAGES: { id: Stage; label: string; color: string }[] = [
@@ -32,6 +33,21 @@ export default function PipelineCRM() {
     return () => unsubscribe();
   }, []);
 
+  const handleExport = () => {
+    const exportData = brands.map(b => ({
+      Name: b.name,
+      Website: b.website || 'N/A',
+      Category: b.category,
+      Stage: b.stage,
+      Score: b.score || 0,
+      Followers: b.igFollowers || 0,
+      IsMicro: b.isMicro ? 'Yes' : 'No',
+      AddedBy: b.addedBy,
+      CreatedAt: b.createdAt?.toDate?.()?.toISOString() || ''
+    }));
+    exportToCSV(exportData, `d2c-flow-pipeline-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
   const handleMoveStage = async (brandId: string, nextStage: Stage) => {
     await brandService.updateBrand(brandId, { stage: nextStage });
   };
@@ -44,6 +60,13 @@ export default function PipelineCRM() {
           <p className="text-[#6B7280]">Manage brand onboarding from discovery to conversion.</p>
         </div>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-xl text-sm font-medium text-[#374151] hover:bg-[#F9FAFB] transition-all shadow-sm"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-xl text-sm font-medium text-[#374151] hover:bg-[#F9FAFB] transition-all shadow-sm">
             <Filter className="w-4 h-4" />
             Filter
