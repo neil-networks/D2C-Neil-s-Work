@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Brand": {
+      "title": "Brand",
+      "description": "A D2C brand discovered or managed in the pipeline.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "website": { "type": "string" },
+        "category": { "type": "string" },
+        "stage": { "type": "string", "enum": ["DISCOVERED", "CONTACTED", "INVITED", "IN_REVIEW", "CONVERTED", "DECLINED"] },
+        "score": { "type": "number" },
+        "igFollowers": { "type": "number" },
+        "isMicro": { "type": "boolean" },
+        "contactName": { "type": "string" },
+        "contactEmail": { "type": "string", "format": "email" },
+        "signals": { "type": "object" },
+        "notes": { "type": "string" },
+        "addedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "stage", "addedBy"]
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "description": "Log of actions taken on a brand.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "brandId": { "type": "string" },
+        "type": { "type": "string", "enum": ["STAGE_CHANGE", "OUTREACH", "INVITE_SENT", "NOTE_ADDED"] },
+        "fromStage": { "type": "string" },
+        "toStage": { "type": "string" },
+        "message": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["brandId", "type", "userId", "createdAt"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Application user profile and role.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "viewer"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/brands/{brandId}": {
+      "schema": { "$ref": "Brand" },
+      "description": "Collection of D2C brands."
+    },
+    "/brands/{brandId}/activities/{activityId}": {
+      "schema": { "$ref": "ActivityLog" },
+      "description": "Activity history for a specific brand."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profiles and permissions."
+    }
+  }
+}
